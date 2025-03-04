@@ -1,26 +1,55 @@
-import { useState } from "react";
-import FilterableProductTable from "./components/FilterableProductTable";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import BookList from "./components/BookList";
+import ViewBook from "./components/ViewBook";
+import BookForm from "./components/BookForm";
 
-export default function App() {
-  const products = [
-    { category: "Fruits", price: "$1", stocked: true, name: "Apple"},
-    { category: "Fruits", price: "$1", stocked: true, name: "Dragonfruit"},
-    { category: "Fruits", price: "$2", stocked: false, name: "Passionfruit"},
-    { category: "Vegetables", price: "$2", stocked: true, name: "Spinach"},
-    { category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin"},
-    { category: "Vegetables", price: "$1", stocked: true, name: "Peas"},
-  ];
+const API_URL = 'https://node71398-node10079.proen.app.ruk-com.cloud/books';
 
-  const [filterText, setFilterText] = useState("");
-  const [inStockOnly, setInstockOnly] = useState(false);
+const App = () => {
+  const [books, setBooks] = useState([]);
+  const [selectBook, setSelectBook] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  return (
-    <FilterableProductTable
-      products={products}
-      filterData={filterText}
-      filterAction={setFilterText}
-      inStockOnlyData={inStockOnly}
-      inStockOnlyAction={setInstockOnly}
-    />
-  );
+  const handleError = (err) => {
+    if (err.response) {
+      setError(`Error: ${err.response.statue} - ${err.response.data.message}`);
+    } else if (err.request) {
+      setError('Network error: No response received from server.');
+    } else {
+      setError(`Error: ${err.message}`);
+    }
+  };
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(API_URL);
+        setBooks(response.data);
+        setError(null);
+        setLoading(false);
+      } catch (err) {
+        handleError(err);
+        setLoading(false);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  const handleView = (id) => {
+    setSelectBook(books.find((book) => book.id === id));
+    setViewMode('view');
+  };
+
+  const handleEdit = (id) => {
+    setSelectBook(books.find((book) => book.id === id) || null);
+    setViewMode('edit');
+  };
+
+  const handleDelete = async (id) => {
+    
+  }
 }
