@@ -1,3 +1,5 @@
+// App.jsx work with all components
+
 import { useState } from "react";
 import FilterableProductTable from "./components/FilterableProductTable";
 
